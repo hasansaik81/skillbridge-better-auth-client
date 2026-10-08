@@ -6,9 +6,9 @@ import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { ModeToggle } from "../Theme/ModeToggle";
 import { Badge } from "@/components/ui/badge";
 import { SignOutButton } from "../AuthLayout/SignoutButton";
+import { ModeToggle } from "../Theme/ModeToggle";
 
 interface NavbarClientProps {
   user?: any;

@@ -1,12 +1,11 @@
 import Link from "next/link";
-import { getAuthSession } from "@/actions/auth.action";
-// import BrandLogo from "../WebLogo/BrandLogo";
 import { Badge } from "../ui/badge";
-import { ModeToggle } from "../Theme/ModeToggle";
 import { Button } from "../ui/button";
 import NavbarClient from "./NavBarClient";
-import { SignOutButton } from "../AuthLayout/SignoutButton";
 import BrandLogo from "../WebLogo/BrandLogo";
+import { SignOutButton } from "../AuthLayout/SignoutButton";
+import { getAuthSession } from "@/actions/auth.action";
+import { ModeToggle } from "../Theme/ModeToggle";
 
 const navLinks = [
   { name: "Home", href: "/" },
