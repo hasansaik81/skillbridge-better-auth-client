@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { authClientService } from "@/services/authService.client";
+// import { authClientService } from "@/services/authService.client";
 
 export function SignOutButton() {
   const [isSigningOut, setIsSigningOut] = useState(false);
