@@ -169,3 +169,253 @@ export default function LoginForm() {
     </AuthCard>
   );
 }
+
+
+
+
+
+
+
+
+// "use client";
+
+// import Link from "next/link";
+// import { useRouter, useSearchParams } from "next/navigation";
+// import { useForm } from "@tanstack/react-form";
+// import { z } from "zod";
+// import { ArrowRight, Lock, Mail } from "lucide-react";
+// import { toast } from "sonner";
+
+// import { Button } from "@/components/ui/button";
+// import { Input } from "@/components/ui/input";
+// import { AuthCard } from "@/components/AuthLayout/AuthCard";
+// import {
+//   Field,
+//   FieldError,
+//   FieldGroup,
+//   FieldLabel,
+// } from "@/components/ui/field";
+// import { authClient } from "@/lib/auth-client";
+
+// const formData = z.object({
+//   email: z.string().email("Please enter a valid email"),
+//   password: z.string().min(8, "Please enter a valid password"),
+// });
+
+// export default function LoginForm() {
+//   const router = useRouter();
+//   const searchParams = useSearchParams();
+
+//   const redirectPath = searchParams.get("redirect") || "/";
+
+//   const handleGoogleLogin = async () => {
+//     console.log("Google login button clicked");
+
+//     try {
+//       const { error } = await authClient.signIn.social({
+//         provider: "google",
+//         callbackURL: redirectPath,
+//       });
+
+//       if (error) {
+//         console.error("Google login failed:", error);
+//         toast.error(error.message || "Google login failed");
+//       }
+//     } catch (error) {
+//       console.error("Google login exception:", error);
+//       toast.error("Unable to start Google login");
+//     }
+//   };
+
+//   const form = useForm({
+//     defaultValues: {
+//       email: "",
+//       password: "",
+//     },
+//     validators: {
+//       onSubmit: formData,
+//     },
+//     onSubmit: async ({ value }) => {
+//       const toastId = toast.loading("Signing in...");
+
+//       try {
+//         const { data, error } = await authClient.signIn.email({
+//           email: value.email,
+//           password: value.password,
+//           callbackURL: redirectPath,
+//           rememberMe: true,
+//         });
+
+//         if (error) {
+//           console.error("Email login failed:", error);
+//           toast.error(error.message || "Login failed", {
+//             id: toastId,
+//           });
+//           return;
+//         }
+
+//         if (data) {
+//           toast.success("Login successful!", {
+//             id: toastId,
+//           });
+
+//           router.replace(redirectPath);
+//           router.refresh();
+//         } else {
+//           toast.error("Login could not be completed.", {
+//             id: toastId,
+//           });
+//         }
+//       } catch (error) {
+//         console.error("Email login exception:", error);
+
+//         toast.error("Something went wrong. Please try again.", {
+//           id: toastId,
+//         });
+//       }
+//     },
+//   });
+
+//   return (
+//     <AuthCard
+//       title="Welcome back"
+//       description="Enter your credentials to access your account"
+//     >
+//       <div className="space-y-5">
+//         <Button
+//           type="button"
+//           variant="outline"
+//           className="w-full h-12"
+//           onClick={handleGoogleLogin}
+//         >
+//           Continue with Google
+//         </Button>
+
+//         <div className="flex items-center gap-3">
+//           <div className="h-px flex-1 bg-border" />
+//           <span className="text-xs text-muted-foreground">OR</span>
+//           <div className="h-px flex-1 bg-border" />
+//         </div>
+
+//         <form
+//           id="login-form"
+//           onSubmit={(event) => {
+//             event.preventDefault();
+//             event.stopPropagation();
+//             void form.handleSubmit();
+//           }}
+//           className="space-y-5"
+//         >
+//           <FieldGroup>
+//             <form.Field
+//               name="email"
+//               children={(field) => {
+//                 const isInvalid =
+//                   field.state.meta.isTouched &&
+//                   !field.state.meta.isValid;
+
+//                 return (
+//                   <Field>
+//                     <FieldLabel
+//                       className="text-sm font-medium"
+//                       htmlFor={field.name}
+//                     >
+//                       Email
+//                     </FieldLabel>
+
+//                     <div className="relative group">
+//                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+
+//                       <Input
+//                         id={field.name}
+//                         name={field.name}
+//                         type="email"
+//                         autoComplete="email"
+//                         placeholder="hello@skillbridge.com"
+//                         value={field.state.value}
+//                         onBlur={field.handleBlur}
+//                         onChange={(event) =>
+//                           field.handleChange(event.target.value)
+//                         }
+//                         className="pl-10 h-12 bg-background/50 border-border/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all"
+//                       />
+//                     </div>
+
+//                     {isInvalid && (
+//                       <FieldError errors={field.state.meta.errors} />
+//                     )}
+//                   </Field>
+//                 );
+//               }}
+//             />
+
+//             <form.Field
+//               name="password"
+//               children={(field) => {
+//                 const isInvalid =
+//                   field.state.meta.isTouched &&
+//                   !field.state.meta.isValid;
+
+//                 return (
+//                   <Field>
+//                     <FieldLabel
+//                       className="text-sm font-medium"
+//                       htmlFor={field.name}
+//                     >
+//                       Password
+//                     </FieldLabel>
+
+//                     <div className="relative group">
+//                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+
+//                       <Input
+//                         id={field.name}
+//                         name={field.name}
+//                         type="password"
+//                         autoComplete="current-password"
+//                         placeholder="Enter your password"
+//                         value={field.state.value}
+//                         onBlur={field.handleBlur}
+//                         onChange={(event) =>
+//                           field.handleChange(event.target.value)
+//                         }
+//                         className="pl-10 h-12 bg-background/50 border-border/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all"
+//                       />
+//                     </div>
+
+//                     {isInvalid && (
+//                       <FieldError errors={field.state.meta.errors} />
+//                     )}
+//                   </Field>
+//                 );
+//               }}
+//             />
+//           </FieldGroup>
+
+//           <Button
+//             type="submit"
+//             form="login-form"
+//             className="w-full h-12 text-base font-medium bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 transition-all duration-300 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30"
+//           >
+//             Sign In
+//             <ArrowRight className="ml-2 h-4 w-4" />
+//           </Button>
+//         </form>
+
+//         <p className="text-center text-sm text-muted-foreground">
+//           Don&apos;t have an account?{" "}
+//           <Link
+//             href="/signup"
+//             className="font-semibold text-primary hover:text-primary/80 underline-offset-4 hover:underline transition-all"
+//           >
+//             Create account
+//           </Link>
+//         </p>
+//       </div>
+//     </AuthCard>
+//   );
+// }
+
+
+
+

@@ -7,5 +7,5 @@ export const metadat:Metadata={
 
 
 export default function LonginPage(){
-    return LoginForm
+    return <LoginForm/>
 }

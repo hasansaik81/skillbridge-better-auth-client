@@ -117,13 +117,13 @@ export function AuthLayoutClient({ children }: { children: React.ReactNode }) {
             <div className="mt-4 flex items-center gap-3">
               <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-primary/50 flex items-center justify-center">
                 <span className="text-sm font-bold text-primary-foreground">
-                  NH
+                  H
                 </span>
               </div>
               <div>
-                <p className="text-sm font-semibold">Md. Nazmul Hossen</p>
+                <p className="text-sm font-semibold">Md. Hasan Saik</p>
                 <p className="text-xs text-muted-foreground">
-                  Full Stack Developer • 50+ sessions
+                  MERN Stack Developer • 50+ sessions
                 </p>
               </div>
             </div>
