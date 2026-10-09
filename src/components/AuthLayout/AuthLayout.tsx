@@ -4,8 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import Link from "next/link";
 import { GraduationCap, Sparkles, Shield, Clock, Users } from "lucide-react";
-import { AnimatedGradient } from "./AnimatedGradient";
 import BrandLogo from "../WebLogo/BrandLogo";
+import { AnimatedGradient } from "./AnimatedGradient";
 
 export function AuthLayoutClient({ children }: { children: React.ReactNode }) {
   return (
