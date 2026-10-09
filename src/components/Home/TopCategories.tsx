@@ -1,388 +1,478 @@
-// components/Home/FeaturedTutors.tsx
+// components/Home/TopCategories.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { publicFeaturedTutor } from "@/actions/public.action";
+import { motion } from "framer-motion";
+import {
+  BookOpen,
+  Calculator,
+  Beaker,
+  Globe,
+  Code,
+  Music,
+  Palette,
+  TrendingUp,
+  ArrowRight,
+  Sparkles,
+  Users,
+  Clock,
+  Star,
+} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Star,
-  GraduationCap,
-  Award,
-  ChevronRight,
-  AlertCircle,
-  RefreshCw,
-  Sparkles,
-} from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
-interface Education {
-  id: string;
-  institute: string;
-  degree: string;
-  fieldOfStudy: string;
-  isCurrent: boolean;
-}
+const categories = [
+  {
+    id: "math",
+    name: "Mathematics",
+    icon: Calculator,
+    gradient: "from-primary to-primary/60",
+    bgLight: "bg-primary/10",
+    textLight: "text-primary",
+    students: "12.5k+",
+    tutors: 245,
+    subjects: ["Algebra", "Calculus", "Geometry", "Statistics", "Trigonometry"],
+  },
+  {
+    id: "science",
+    name: "Science",
+    icon: Beaker,
+    gradient: "from-primary to-primary/60",
+    bgLight: "bg-primary/10",
+    textLight: "text-primary",
+    students: "10.2k+",
+    tutors: 189,
+    subjects: [
+      "Physics",
+      "Chemistry",
+      "Biology",
+      "Environmental Sci",
+      "Astronomy",
+    ],
+  },
+  {
+    id: "programming",
+    name: "Programming",
+    icon: Code,
+    gradient: "from-primary to-primary/60",
+    bgLight: "bg-primary/10",
+    textLight: "text-primary",
+    students: "15.8k+",
+    tutors: 312,
+    subjects: ["JavaScript", "Python", "Java", "Web Dev", "Data Science"],
+  },
+  {
+    id: "languages",
+    name: "Languages",
+    icon: Globe,
+    gradient: "from-primary to-primary/60",
+    bgLight: "bg-primary/10",
+    textLight: "text-primary",
+    students: "8.9k+",
+    tutors: 167,
+    subjects: ["English", "Spanish", "French", "German", "Mandarin"],
+  },
+  {
+    id: "arts",
+    name: "Arts & Design",
+    icon: Palette,
+    gradient: "from-primary to-primary/60",
+    bgLight: "bg-primary/10",
+    textLight: "text-primary",
+    students: "6.4k+",
+    tutors: 98,
+    subjects: ["Drawing", "Painting", "Digital Art", "Photography", "Design"],
+  },
+  {
+    id: "music",
+    name: "Music",
+    icon: Music,
+    gradient: "from-primary to-primary/60",
+    bgLight: "bg-primary/10",
+    textLight: "text-primary",
+    students: "7.2k+",
+    tutors: 134,
+    subjects: ["Piano", "Guitar", "Violin", "Music Theory", "Vocal"],
+  },
+];
 
-interface Subject {
-  id: string;
-  subject: {
-    id: string;
-    name: string;
-    category: {
-      id: string;
-      name: string;
-    };
-  };
-}
+const popularSubjects = [
+  {
+    name: "JavaScript",
+    category: "Programming",
+    students: 3421,
+    tutors: 89,
+    growth: "+24%",
+  },
+  {
+    name: "Calculus",
+    category: "Mathematics",
+    students: 2856,
+    tutors: 67,
+    growth: "+18%",
+  },
+  {
+    name: "Python",
+    category: "Programming",
+    students: 4123,
+    tutors: 112,
+    growth: "+32%",
+  },
+  {
+    name: "Physics",
+    category: "Science",
+    students: 1987,
+    tutors: 45,
+    growth: "+12%",
+  },
+  {
+    name: "English",
+    category: "Languages",
+    students: 2567,
+    tutors: 78,
+    growth: "+15%",
+  },
+  {
+    name: "Guitar",
+    category: "Music",
+    students: 1432,
+    tutors: 34,
+    growth: "+21%",
+  },
+];
 
-interface Tutor {
-  id: string;
-  userId: string;
-  hourlyRate: string;
-  isFeatured: boolean;
-  user: {
-    id: string;
-    name: string;
-    email: string;
-    image: string | null;
-  };
-  education: Education[];
-  subjects: Subject[];
-}
+const stats = [
+  { label: "Active Students", value: "45.2k+", icon: Users, change: "+15.3%" },
+  { label: "Expert Tutors", value: "1,245+", icon: Star, change: "+8.7%" },
+  { label: "Daily Sessions", value: "892+", icon: Clock, change: "+21.4%" },
+  { label: "Subjects", value: "156+", icon: BookOpen, change: "+6.2%" },
+];
 
-interface FeaturedTutorsProps {
-  initialData?: Tutor[];
-}
-
-export function FeaturedTutors({ initialData }: FeaturedTutorsProps) {
-  const [tutors, setTutors] = useState<Tutor[]>(initialData || []);
-  const [loading, setLoading] = useState(!initialData);
-  const [error, setError] = useState<string | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
+export function TopCategories() {
+  const [mounted, setMounted] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [tutorCounts, setTutorCounts] = useState<Record<string, number[]>>({});
 
   useEffect(() => {
-    if (initialData) {
-      setTutors(initialData);
-      setLoading(false);
-      return;
-    }
+    setMounted(true);
 
-    const fetchFeaturedTutors = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const result = await publicFeaturedTutor();
-        if (result.error) {
-          setError(
-            typeof result.error === "string"
-              ? result.error
-              : "Failed to load featured tutors",
-          );
-        } else {
-          setTutors(result.data || []);
-        }
-      } catch (err) {
-        setError("An unexpected error occurred");
-      } finally {
-        setLoading(false);
-      }
-    };
+    // Generate random tutor counts for each category's subjects
+    const counts: Record<string, number[]> = {};
+    categories.forEach((category) => {
+      counts[category.id] = category.subjects.map(
+        () => Math.floor(Math.random() * 50) + 20,
+      );
+    });
+    setTutorCounts(counts);
+  }, []);
 
-    fetchFeaturedTutors();
-  }, [initialData, retryCount]);
+  if (!mounted) {
+    return (
+      <section className="w-full bg-gradient-to-b from-background to-muted/30 relative overflow-hidden mb-8">
+        <div className="w-full max-w-full mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Section Header Skeleton */}
+          <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
+            <Skeleton className="h-10 w-64 mx-auto mb-4" />
+            <Skeleton className="h-6 w-96 mx-auto" />
+          </div>
 
-  const handleRetry = () => {
-    setRetryCount((prev) => prev + 1);
-  };
+          {/* Stats Skeleton */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+            {[1, 2, 3, 4].map((i) => (
+              <Card key={i} className="border-border/50 bg-card/50">
+                <CardContent className="p-4 sm:p-5">
+                  <Skeleton className="h-8 w-8 rounded-full mb-2" />
+                  <Skeleton className="h-8 w-20 mb-1" />
+                  <Skeleton className="h-4 w-24" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
 
-  // Get initials for avatar fallback
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
-  // Get highest education
-  const getHighestEducation = (education: Education[]) => {
-    if (!education || education.length === 0) return null;
-    return education[0];
-  };
-
-  // Get first 2 subjects
-  const getSubjectNames = (subjects: Subject[]) => {
-    if (!subjects || subjects.length === 0) return [];
-    return subjects.slice(0, 2).map((s) => s.subject.name);
-  };
-
-  // Calculate grid columns based on number of tutors
-  const getGridClass = (count: number) => {
-    if (count === 1) return "grid-cols-1 max-w-md mx-auto";
-    if (count === 2) return "grid-cols-1 md:grid-cols-2 max-w-3xl mx-auto";
-    if (count === 3)
-      return "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto";
-    return "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4";
-  };
+          {/* Categories Grid Skeleton */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6 mt-8">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Card key={i} className="border-border bg-card">
+                <CardContent className="p-5 sm:p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <Skeleton className="w-12 h-12 rounded-lg" />
+                    <div className="flex-1">
+                      <Skeleton className="h-6 w-32 mb-2" />
+                      <Skeleton className="h-4 w-20" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    {[1, 2, 3, 4].map((j) => (
+                      <div key={j} className="flex justify-between py-1">
+                        <Skeleton className="h-4 w-24" />
+                        <Skeleton className="h-4 w-16" />
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <section className="w-full py-16 md:py-20 lg:py-24 bg-gradient-to-b from-background via-background to-muted/30">
-      <div className="w-full px-4 sm:px-6 lg:px-8">
+    <section className="w-full bg-gradient-to-b from-background to-muted/30 relative overflow-hidden mb-8">
+      {/* Animated Background */}
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute top-20 right-20 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 left-20 w-80 h-80 bg-primary/10 rounded-full blur-3xl animate-pulse delay-1000" />
+      </div>
+
+      <div className="w-full max-w-full mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/5 border border-primary/10 mb-6">
-            <Sparkles className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium text-primary">
-              Featured Tutors
-            </span>
-          </div>
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
-            Learn from{" "}
+          <Badge
+            variant="outline"
+            className="mb-4 px-3 py-1 text-xs border-border bg-muted/50 inline-flex items-center"
+          >
+            <Sparkles className="h-3 w-3 mr-1 text-primary" />
+            Explore Categories
+          </Badge>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 text-foreground">
+            Find Your Perfect{" "}
             <span className="bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
-              Expert Educators
+              Learning Path
             </span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-4">
-            Hand-picked top-rated tutors ready to help you master any subject
+          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
+            Browse through our extensive collection of subjects taught by expert
+            tutors
           </p>
         </div>
 
-        {/* Content Area */}
-        <div className="relative">
-          {/* Loading State */}
-          {loading && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[1, 2, 3, 4].map((i) => (
-                <Card key={i} className="border-border/50 overflow-hidden">
-                  <CardContent className="p-6">
-                    <div className="flex flex-col items-center text-center">
-                      <Skeleton className="h-20 w-20 rounded-full mb-4" />
-                      <Skeleton className="h-5 w-32 mb-2" />
-                      <Skeleton className="h-4 w-24 mb-3" />
-                      <div className="flex gap-1 justify-center mb-4">
-                        {[1, 2, 3, 4, 5].map((s) => (
-                          <Skeleton
-                            key={s}
-                            className="h-3.5 w-3.5 rounded-full"
-                          />
-                        ))}
+        {/* Live Stats Strip */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+          {stats.map((stat, index) => {
+            const Icon = stat.icon;
+            return (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="relative"
+              >
+                <Card className="border-border bg-card backdrop-blur-sm">
+                  <CardContent className="p-4 sm:p-5">
+                    <div className="flex items-center justify-between mb-2">
+                      <Icon className="h-5 w-5 text-primary" />
+                      <Badge
+                        variant="outline"
+                        className="bg-green-500/10 text-green-600 dark:bg-green-500/20 dark:text-green-400 text-xs"
+                      >
+                        {stat.change}
+                      </Badge>
+                    </div>
+                    <p className="text-2xl sm:text-3xl font-bold text-foreground">
+                      {stat.value}
+                    </p>
+                    <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+                      {stat.label}
+                    </p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* Categories Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6 mt-8">
+          {categories.map((category, index) => {
+            const Icon = category.icon;
+            const isActive = activeCategory === category.id;
+
+            return (
+              <motion.div
+                key={category.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                viewport={{ once: true }}
+                onHoverStart={() => setActiveCategory(category.id)}
+                onHoverEnd={() => setActiveCategory(null)}
+                className="relative group outline-none focus:outline-none h-full"
+              >
+                <Card
+                  className={cn(
+                    "relative overflow-hidden border-2 transition-all duration-500 h-full bg-card",
+                    isActive
+                      ? "border-primary shadow-xl shadow-primary/20 scale-[1.02]"
+                      : "border-border hover:border-primary/30",
+                  )}
+                >
+                  {/* Gradient Overlay */}
+                  <div
+                    className={cn(
+                      "absolute inset-0 bg-gradient-to-br from-primary/5 via-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500",
+                    )}
+                  />
+
+                  <CardContent className="p-5 sm:p-6">
+                    {/* Header */}
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={cn(
+                            "w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center bg-primary/10",
+                          )}
+                        >
+                          <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-lg sm:text-xl text-foreground">
+                            {category.name}
+                          </h3>
+                          <p className="text-xs sm:text-sm text-muted-foreground">
+                            {category.tutors} Tutors
+                          </p>
+                        </div>
                       </div>
-                      <Skeleton className="h-4 w-40 mb-2" />
-                      <Skeleton className="h-4 w-36 mb-4" />
-                      <div className="flex gap-2 mb-4">
-                        <Skeleton className="h-6 w-16 rounded-full" />
-                        <Skeleton className="h-6 w-16 rounded-full" />
+
+                      {/* Student Count Badge */}
+                      <Badge
+                        variant="secondary"
+                        className="bg-primary/10 text-primary border-0"
+                      >
+                        {category.students}
+                      </Badge>
+                    </div>
+
+                    {/* Subjects List */}
+                    <div className="space-y-2 mb-4">
+                      {category.subjects.slice(0, 4).map((subject, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between text-sm py-1 border-b border-border/50 last:border-0"
+                        >
+                          <span className="text-foreground/80">{subject}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {tutorCounts[category.id]?.[idx] || 20}+ tutors
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Explore Link */}
+                    <Link
+                      href={`/tutors?category=${category.id}`}
+                      className="inline-flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors group/link"
+                    >
+                      Explore {category.name}
+                      <ArrowRight className="h-4 w-4 group-hover/link:translate-x-1 transition-transform" />
+                    </Link>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* Popular Subjects Section */}
+        <div className="mt-16 md:mt-20">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+            <div>
+              <h3 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
+                Trending Subjects
+              </h3>
+              <p className="text-sm sm:text-base text-muted-foreground">
+                Most popular subjects among students this month
+              </p>
+            </div>
+            <Badge
+              variant="outline"
+              className="px-3 py-1 bg-primary/5 border-primary/20"
+            >
+              <TrendingUp className="h-3 w-3 mr-1 text-primary" />
+              Updated daily
+            </Badge>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {popularSubjects.map((subject, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <Card className="border-border hover:border-primary/30 transition-colors bg-card backdrop-blur-sm">
+                  <CardContent className="p-4 sm:p-5">
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <h4 className="font-semibold text-foreground">
+                          {subject.name}
+                        </h4>
+                        <p className="text-xs text-muted-foreground">
+                          {subject.category}
+                        </p>
                       </div>
-                      <Skeleton className="h-9 w-28 rounded-md mt-2" />
+                      <Badge className="bg-green-500/10 text-green-600 dark:bg-green-500/20 dark:text-green-400 border-0">
+                        {subject.growth}
+                      </Badge>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 mt-3">
+                      <div className="bg-muted/30 p-2 rounded-lg text-center">
+                        <p className="text-xs text-muted-foreground">
+                          Students
+                        </p>
+                        <p className="font-bold text-primary">
+                          {subject.students.toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="bg-muted/30 p-2 rounded-lg text-center">
+                        <p className="text-xs text-muted-foreground">Tutors</p>
+                        <p className="font-bold text-foreground">
+                          {subject.tutors}
+                        </p>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
-              ))}
-            </div>
-          )}
+              </motion.div>
+            ))}
+          </div>
+        </div>
 
-          {/* Error State */}
-          {!loading && error && (
-            <div className="max-w-md mx-auto">
-              <Card className="border-destructive/20">
-                <CardContent className="p-8 text-center">
-                  <div className="relative inline-block mb-4">
-                    <div className="absolute inset-0 rounded-full bg-destructive/20 animate-ping" />
-                    <AlertCircle className="h-12 w-12 text-destructive/60 relative" />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2">
-                    Unable to Load Tutors
-                  </h3>
-                  <p className="text-muted-foreground mb-6">{error}</p>
-                  <Button
-                    onClick={handleRetry}
-                    variant="outline"
-                    className="gap-2"
-                  >
-                    <RefreshCw className="h-4 w-4" />
-                    Try Again
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-
-          {/* Empty State */}
-          {!loading && !error && tutors.length === 0 && (
-            <div className="max-w-md mx-auto">
-              <Card className="border-border/50">
-                <CardContent className="p-8 text-center">
-                  <div className="relative inline-block mb-4">
-                    <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />
-                    <div className="relative bg-gradient-to-b from-primary/10 to-transparent p-4 rounded-full">
-                      <Award className="h-12 w-12 text-primary/60" />
-                    </div>
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2">Coming Soon</h3>
-                  <p className="text-muted-foreground max-w-sm mx-auto mb-6">
-                    We're hand-picking exceptional tutors to feature. Check back
-                    soon!
-                  </p>
-                  <Link href="/tutors">
-                    <Button variant="outline" size="lg">
-                      Browse All Tutors
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-
-          {/* Success State with Tutors */}
-          {!loading && !error && tutors.length > 0 && (
-            <>
-              <div className={cn("grid gap-6", getGridClass(tutors.length))}>
-                {tutors.map((tutor) => {
-                  const highestEdu = getHighestEducation(tutor.education);
-                  const subjectNames = getSubjectNames(tutor.subjects);
-                  const initials = getInitials(tutor.user.name);
-
-                  return (
-                    <Card
-                      key={tutor.id}
-                      className="group relative overflow-hidden border-border/50 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-card/50 backdrop-blur-sm"
-                    >
-                      {/* Featured Badge */}
-                      <div className="absolute top-3 right-3 z-10">
-                        <Badge className="bg-gradient-to-r from-yellow-500/20 to-yellow-500/10 text-yellow-600 border-yellow-500/20 backdrop-blur-sm">
-                          <Award className="h-3 w-3 mr-1 fill-yellow-500" />
-                          Featured
-                        </Badge>
-                      </div>
-
-                      {/* Card Content */}
-                      <CardContent className="p-6">
-                        <div className="flex flex-col items-center text-center">
-                          {/* Avatar */}
-                          <div className="relative mb-4">
-                            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/30 to-primary/10 blur-xl group-hover:blur-2xl transition-all" />
-                            <Avatar className="h-20 w-20 border-2 border-primary/10 group-hover:border-primary/30 transition-colors relative">
-                              {tutor.user.image ? (
-                                <AvatarImage
-                                  src={tutor.user.image}
-                                  alt={tutor.user.name}
-                                />
-                              ) : (
-                                <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/5 text-primary text-lg">
-                                  {initials}
-                                </AvatarFallback>
-                              )}
-                            </Avatar>
-                          </div>
-
-                          {/* Name & Title */}
-                          <h3 className="font-semibold text-lg mb-1 group-hover:text-primary transition-colors">
-                            {tutor.user.name}
-                          </h3>
-
-                          {/* Education */}
-                          {highestEdu && (
-                            <p className="text-sm text-muted-foreground mb-2 line-clamp-1">
-                              <span className="font-medium text-foreground">
-                                {highestEdu.degree}
-                              </span>{" "}
-                              in {highestEdu.fieldOfStudy}
-                            </p>
-                          )}
-
-                          {/* Rating */}
-                          <div className="flex items-center gap-1 mb-3">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <Star
-                                key={star}
-                                className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400"
-                              />
-                            ))}
-                            <span className="text-xs text-muted-foreground ml-1">
-                              5.0
-                            </span>
-                          </div>
-
-                          {/* Institute */}
-                          {highestEdu && (
-                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-3">
-                              <GraduationCap className="h-3.5 w-3.5" />
-                              <span className="line-clamp-1">
-                                {highestEdu.institute}
-                              </span>
-                            </div>
-                          )}
-
-                          {/* Subjects */}
-                          {subjectNames.length > 0 && (
-                            <div className="flex flex-wrap gap-1.5 justify-center mb-4">
-                              {subjectNames.map((subject, idx) => (
-                                <Badge
-                                  key={idx}
-                                  variant="secondary"
-                                  className="bg-primary/5 text-xs font-normal px-2 py-0.5"
-                                >
-                                  {subject}
-                                </Badge>
-                              ))}
-                              {tutor.subjects.length > 2 && (
-                                <Badge
-                                  variant="secondary"
-                                  className="bg-primary/5 text-xs font-normal px-2 py-0.5"
-                                >
-                                  +{tutor.subjects.length - 2}
-                                </Badge>
-                              )}
-                            </div>
-                          )}
-
-                          {/* Hourly Rate */}
-                          <div className="mb-4">
-                            <p className="text-2xl font-bold text-primary">
-                              ${tutor.hourlyRate}
-                              <span className="text-xs text-muted-foreground font-normal ml-1">
-                                /hr
-                              </span>
-                            </p>
-                          </div>
-
-                          {/* View Profile Button */}
-                          <Link href={`/tutors/${tutor.id}`} className="w-full">
-                            <Button
-                              size="sm"
-                              className="w-full group/btn relative overflow-hidden"
-                              variant="outline"
-                            >
-                              <span className="relative z-10 flex items-center justify-center gap-1">
-                                View Profile
-                                <ChevronRight className="h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
-                              </span>
-                            </Button>
-                          </Link>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-
-              {/* View All Tutors Button */}
-              <div className="flex justify-center mt-12 md:mt-16">
+        {/* CTA Banner */}
+        <div className="mt-16 md:mt-20">
+          <Card className="border-primary/20 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent">
+            <CardContent className="p-8 sm:p-10 text-center">
+              <h3 className="text-2xl sm:text-3xl font-bold text-foreground mb-3">
+                Ready to Start Learning?
+              </h3>
+              <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto mb-6">
+                Join thousands of students who are already learning with our
+                expert tutors
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/tutors">
-                  <Button size="lg" className="group gap-2 px-8">
-                    <span>Browse All Tutors</span>
-                    <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  <Button
+                    size="lg"
+                    className="gap-2 px-8 bg-primary hover:bg-primary/90 text-primary-foreground"
+                  >
+                    Browse All Tutors
+                    <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
               </div>
-            </>
-          )}
+            </CardContent>
+          </Card>
         </div>
       </div>
     </section>
