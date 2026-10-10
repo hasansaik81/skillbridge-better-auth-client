@@ -1,7 +1,11 @@
-export default function Student(){
-    return(
-        <div>
-            This is student page 
-        </div>
-    )
+import { getStudentProfile } from "@/actions/student.action"
+import { ErrorDisplay } from "@/components/GlobalComponent/ErrorDisplay";
+
+export default async function StudentDashboardPage(){
+
+    const {data:student,error}=await getStudentProfile();
+    if(error|| !student){
+        return <ErrorDisplay error={error} data={student}/>
+    }
+    return  <DashboardRootPageClient student={student}/>
 }
