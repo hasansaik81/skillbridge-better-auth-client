@@ -1,0 +1,37 @@
+import { getAllPublicTutor } from "@/actions/public.action";
+import { getAllCategoryWithSubject } from "@/actions/tutor.action";
+import { TutorsPageProps } from "../../../../types/public.types";
+import { TutorsClient } from "@/components/TutorPage/TeacherClient";
+
+
+export const metadata = {
+  title: "Tutors",
+  description: "Get all tutor with their profile details.",
+};
+
+export default async function TutorsPage({ searchParams }: TutorsPageProps) {
+  const { search, category, minPrice, maxPrice, rating, page } =
+    await searchParams;
+  const categoriesData = await getAllCategoryWithSubject();
+  const categories = categoriesData.data || [];
+  const params = {
+    search: search || undefined,
+    category: category || undefined,
+    minPrice: minPrice ? Number(minPrice) : undefined,
+    maxPrice: maxPrice ? Number(maxPrice) : undefined,
+    rating: rating ? Number(rating) : undefined,
+    page: page ? Number(page) : 1,
+    limit: 9,
+  };
+
+  const { data, error } = await getAllPublicTutor(params);
+
+  return (
+    <TutorsClient
+      initialData={data}
+      initialError={error}
+      initialParams={{ search, category, minPrice, maxPrice, rating, page }}
+      categories={categories}
+    />
+  );
+}

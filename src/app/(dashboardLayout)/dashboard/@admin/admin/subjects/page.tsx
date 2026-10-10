@@ -2,7 +2,7 @@ import {
   getAllSubjectsByAdmin,
   getAllCategoriesByAdmin,
 } from "@/actions/admin.action";
-import { DashboardAdminSubjectsClient } from "@/components/Dashboard/admin/DashboardAdminSubjectsClient";
+import { DashboardAdminSubjectsClient } from "@/components/Dashboard/Admin/DashboardAdminSubjectsClient";
 import { ErrorDisplay } from "@/components/GlobalComponent/ErrorDisplay";
 
 export default async function AdminSubjectsPage() {

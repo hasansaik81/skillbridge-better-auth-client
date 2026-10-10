@@ -1,5 +1,5 @@
 import { getAllUsersByAdmin } from "@/actions/admin.action";
-import { DashboardAdminTutorsClient } from "@/components/Dashboard/admin/DashboardAdminTutorsClient";
+import { DashboardAdminTutorsClient } from "@/components/Dashboard/Admin/DashboardAdminTutorsClient";
 
 
 import { ErrorDisplay } from "@/components/GlobalComponent/ErrorDisplay";

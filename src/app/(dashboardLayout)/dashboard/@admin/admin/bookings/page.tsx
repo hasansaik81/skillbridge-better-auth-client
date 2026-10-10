@@ -1,7 +1,7 @@
 import { allBookings } from "@/actions/admin.action";
 import { redirect } from "next/navigation";
 import { ErrorDisplay } from "@/components/GlobalComponent/ErrorDisplay";
-import { DashboardAdminBookingsClient } from "@/components/Dashboard/admin/DashboardAdminBookingsClient";
+import { DashboardAdminBookingsClient } from "@/components/Dashboard/Admin/DashboardAdminBookingsClient";
 
 export default async function AdminBookingsPage() {
   const { data: bookings, error } = await allBookings();

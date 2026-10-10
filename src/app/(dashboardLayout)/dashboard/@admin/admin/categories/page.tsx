@@ -1,5 +1,6 @@
 import { getAllCategoriesByAdmin } from "@/actions/admin.action";
 import { DashboardAdminCategoriesClient } from "@/components/Dashboard/Admin/DashboardAdminCategoriesClient";
+// import { DashboardAdminCategoriesClient } from "@/components/Dashboard/Admin/DashboardAdminCategoriesClient";
 import { ErrorDisplay } from "@/components/GlobalComponent/ErrorDisplay";
 
 export default async function AdminCategoriesPage() {
