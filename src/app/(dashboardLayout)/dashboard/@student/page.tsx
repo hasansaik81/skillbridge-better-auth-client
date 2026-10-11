@@ -1,4 +1,5 @@
 import { getStudentProfile } from "@/actions/student.action"
+import { DashboardRootPageClient } from "@/components/Dashboard/Student/DashboardRootPageClient";
 import { ErrorDisplay } from "@/components/GlobalComponent/ErrorDisplay";
 
 export default async function StudentDashboardPage(){
