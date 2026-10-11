@@ -1,6 +1,6 @@
 import { getAllPublicTutor } from "@/actions/public.action";
 import { getAllCategoryWithSubject } from "@/actions/tutor.action";
-import { TutorsPageProps } from "../../../../types/public.types";
+import { TutorsPageProps } from "../../../types/public.types";
 import { TutorsClient } from "@/components/TutorPage/TeacherClient";
 
 

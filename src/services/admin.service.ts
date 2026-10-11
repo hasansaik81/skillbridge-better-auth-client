@@ -2,7 +2,7 @@ import { env } from "@/env";
 // import { Status } from "@/types";
 import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
-import { Status } from "../../types/admin.types";
+import { Status } from "../types/admin.types";
 
 export const adminService = {
   // get all category

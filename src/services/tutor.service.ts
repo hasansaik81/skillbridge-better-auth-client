@@ -1,6 +1,6 @@
 import { env } from "@/env";
 import { cookies } from "next/headers";
-import { Education } from "../../types/tutor.types";
+import { Education } from "../types/tutor.types";
 
 
 export const tutorService = {

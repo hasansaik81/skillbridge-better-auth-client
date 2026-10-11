@@ -4,7 +4,7 @@ import { adminService } from "@/services/admin.service";
 // import { adminService } from "@/services/admin.service";
 // import { Status } from "@/types";
 import { revalidateTag } from "next/cache";
-import { Status } from "../../types/admin.types";
+import { Status } from "../types/admin.types";
 
 // get all users
 export const getAllUsersByAdmin = async () => {

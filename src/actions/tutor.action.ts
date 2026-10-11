@@ -4,7 +4,7 @@ import { tutorService } from "@/services/tutor.service";
 // import { tutorService } from "@/services/tutor.service.server";
 // import { Availability, Education } from "@/types";
 import { revalidateTag } from "next/cache";
-import { Availability } from "../../types/tutor.types";
+import { Availability } from "../types/tutor.types";
 
 export const createTutorWithServer = async (hourlyRate: number) => {
   const result = await tutorService.createTutorProfileUsingRate(hourlyRate);
