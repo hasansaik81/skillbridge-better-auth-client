@@ -1,12 +1,14 @@
 "use client";
 
 import { TutorEducation } from "./TutorEducation";
-import { TutorSubject } from "./TutorSubject";
+// import { TutorSubject } from "./TutorSubject";
 import { TutorAvailability } from "./TutorAvailability";
-import { TutorTimeSlot } from "./TutorTimeSlot";
+// import { TutorTimeSlot } from "./TutorTimeSlot";
 import { CheckCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { TutorHourlyRate } from "./HourlyRate";
+import { TutorSubject } from "./TutorSubject";
+import { TutorTimeSlot } from "./TutorTimeSlot";
 
 interface TutorSetupProps {
   userData: any;

@@ -20,10 +20,13 @@ import { TutorBookings } from "./TutorBookings";
 
 // Import your existing components
 import { TutorHourlyRate } from "./HourlyRate";
+// import { TutorEducation } from "./TutorEducation";
+// import { TutorSubject } from "./TutorSubject";
+import { TutorAvailability } from "./TutorAvailability";
 import { TutorEducation } from "./TutorEducation";
 import { TutorSubject } from "./TutorSubject";
-import { TutorAvailability } from "./TutorAvailability";
 import { TutorTimeSlot } from "./TutorTimeSlot";
+// import { TutorTimeSlot } from "./TutorTimeSlot";
 
 interface TutorProfileDetailsProps {
   userData: any;

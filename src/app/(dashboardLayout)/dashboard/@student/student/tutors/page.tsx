@@ -1,0 +1,36 @@
+import { getAllCategoriesByAdmin } from "@/actions/admin.action";
+import { getAllPublicTutor } from "@/actions/public.action";
+import { DashboardTutorsClient } from "@/components/Dashboard/Student/DashboardTeachersClient";
+import { ErrorDisplay } from "@/components/GlobalComponent/ErrorDisplay";
+import { TutorsPageProps } from "@/types";
+
+export default async function TutorsPage({searchParams}:TutorsPageProps){
+    const {search,category,minPrice,maxPrice,rating,page}=
+    await searchParams;
+    const categoriesData=await getAllCategoriesByAdmin();
+    const categories=categoriesData.data||[];
+    const params={
+        search:search||undefined,
+        category:category||undefined,
+        minPrice:minPrice?Number(minPrice):undefined,
+        maxPrice:maxPrice?Number(maxPrice):undefined,
+        rating:rating?Number(rating):undefined,
+        page:page?Number(page):1,
+        limit:9,
+    };
+
+    const {data,error}=await getAllPublicTutor(params);
+    if(error|| !data){
+        return <ErrorDisplay  error={error} data={data}/>;
+        
+    }
+    return(
+        <DashboardTutorsClient
+        initialData={data}
+        initialError={error}
+        initialParams={{search,category,minPrice,maxPrice,rating,page}}
+        categories={categories}
+        />
+    );
+
+}
